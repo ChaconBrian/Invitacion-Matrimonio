@@ -3,24 +3,30 @@ import Countdown from "./Countdown";
 import RedThread from "./RedThread";
 
 const scenes = [
-  { at: 0, text: "A veces el destino solo necesita un hilo para unir dos historias." },
-  { at: 3600, text: "Dos caminos distintos, un mismo destino." },
-  { at: 7000, text: "Y se convierten en una sola historia." },
+  { at: 0, text: "A veces el destino encuentra la manera de unir dos historias." },
+  { at: 2100, text: "Dos caminos distintos, un mismo destino." },
+  { at: 4100, text: "Y desde entonces, elegimos caminar juntos." },
 ];
 
 export default function WeddingIntro() {
+  const [hasStarted, setHasStarted] = useState(false);
   const [sceneIndex, setSceneIndex] = useState(0);
   const [isFinal, setIsFinal] = useState(false);
 
   const handleProgress = useCallback((elapsed) => {
     const nextScene = scenes.findLastIndex((scene) => elapsed >= scene.at);
     setSceneIndex(nextScene);
-    if (elapsed >= 8500) setIsFinal(true);
+    if (elapsed >= 5500) setIsFinal(true);
   }, []);
 
   const classes = ["wedding-intro", isFinal && "is-final"]
     .filter(Boolean)
     .join(" ");
+
+  const startExperience = () => {
+    window.dispatchEvent(new CustomEvent("start-wedding-music"));
+    setHasStarted(true);
+  };
 
   return (
     <main className={classes}>
@@ -28,15 +34,27 @@ export default function WeddingIntro() {
       <div className="soft-light soft-light-two" />
       <div className="floral floral-top" />
       <div className="floral floral-bottom" />
-      <RedThread onProgress={handleProgress} />
+      {hasStarted && <RedThread onProgress={handleProgress} />}
 
-      <section className={`opening-copy ${isFinal ? "is-hidden" : ""}`} aria-live="polite">
+      {!hasStarted && (
+        <div className="start-experience">
+          <span className="start-monogram">B <i>&</i> L</span>
+          <p>Tenemos una historia para contarte</p>
+          <button type="button" onClick={startExperience}>
+            <span aria-hidden="true">♪</span>
+            Toca para comenzar
+          </button>
+          <small>Activa el sonido para vivir la experiencia</small>
+        </div>
+      )}
+
+      <section className={`opening-copy ${!hasStarted || isFinal ? "is-hidden" : ""}`} aria-live="polite">
         <p key={sceneIndex}>{scenes[sceneIndex].text}</p>
       </section>
 
       <section className="main-content">
         <p className="main-phrase">
-          Dicen que un hilo rojo une a quienes están destinados a encontrarse.
+          Dos caminos, dos historias y un destino que decidió unirnos.
         </p>
         <h1>Brian <span>&</span> Luisa</h1>
         <div className="divider"><span /><strong>♥</strong><span /></div>
@@ -46,7 +64,6 @@ export default function WeddingIntro() {
         <a className="enter-button" href="#invitacion">
           Nuestra invitación <span>♡</span>
         </a>
-        <p className="footer-text">Prepárate para ser parte de nuestro mejor día.</p>
       </section>
     </main>
   );

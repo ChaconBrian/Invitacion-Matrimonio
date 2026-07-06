@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const THREAD_DURATION = 11500;
+const THREAD_DURATION = 7000;
 
 function easeInOutCubic(value) {
   return value < 0.5
